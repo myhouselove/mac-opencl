@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		6C6BE5E91F7052FC00D84239 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C6BE5E81F7052FC00D84239 /* main.cpp */; };
+		6C6BE5F21F70596500D84239 /* OpenCL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C6BE5F11F70596500D84239 /* OpenCL.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +26,8 @@
 /* Begin PBXFileReference section */
 		6C6BE5E51F7052FC00D84239 /* OpenCL */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = OpenCL; sourceTree = BUILT_PRODUCTS_DIR; };
 		6C6BE5E81F7052FC00D84239 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		6C6BE5EF1F70555E00D84239 /* HelloWorld.cl */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.opencl; path = HelloWorld.cl; sourceTree = "<group>"; };
+		6C6BE5F11F70596500D84239 /* OpenCL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenCL.framework; path = System/Library/Frameworks/OpenCL.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -32,6 +35,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6C6BE5F21F70596500D84239 /* OpenCL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -43,6 +47,7 @@
 			children = (
 				6C6BE5E71F7052FC00D84239 /* OpenCL */,
 				6C6BE5E61F7052FC00D84239 /* Products */,
+				6C6BE5F01F70596500D84239 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -58,8 +63,17 @@
 			isa = PBXGroup;
 			children = (
 				6C6BE5E81F7052FC00D84239 /* main.cpp */,
+				6C6BE5EF1F70555E00D84239 /* HelloWorld.cl */,
 			);
 			path = OpenCL;
+			sourceTree = "<group>";
+		};
+		6C6BE5F01F70596500D84239 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				6C6BE5F11F70596500D84239 /* OpenCL.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
