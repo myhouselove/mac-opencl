@@ -16,6 +16,10 @@
 #include<time.h>
 #include<stdio.h>
 #include<stdlib.h>
+#include <mach/mach_time.h>
+#include <boost/algorithm/string.hpp>
+
+
 
 
 const int ARRAY_SIZE = 100000;
@@ -143,48 +147,12 @@ void Cleanup(cl_context context, cl_command_queue commandQueue,
         clReleaseContext(context);
 }
 
-class TimerDelta{
-public:
-    TimerDelta(){
-//        //loat time_use=0;
-//        
-//        //struct timezone tz; //后面有说明
-//        gettimeofday(&start,NULL);//gettimeofday(&start,&tz);结果一样
-//        //printf("start.tv_sec:%d\n",start.tv_sec);
-//       // printf("start.tv_usec:%d\n",start.tv_usec);
-//        sleep(3);
-//        gettimeofday(&end,NULL);
-//        printf("end.tv_sec:%d\n",end.tv_sec);
-//        printf("end.tv_usec:%d\n",end.tv_usec);
-//        time_use=(end.tv_sec-start.tv_sec)*1000000+(end.tv_usec-start.tv_usec);//微秒
-//        printf("time_use is %f\n",time_use);
-//        //输出：time_use is 3001410.000000
-//        //下面的采用指针的方式也可以，但是要注意指针类型若不分配内存的话，编译正确，但是运行结果会不对
-
-    }
-    ~TimerDelta(){}
-    
-    void Start(){
-        gettimeofday(&start,NULL);
-        printf("start.tv_sec:%d\n",start.tv_sec);
-        printf("start.tv_usec:%d\n",start.tv_usec);
-    
-    }
-    void Stop(){
-        gettimeofday(&end,NULL);
-        printf("end.tv_sec:%d\n",end.tv_sec);
-        printf("end.tv_usec:%d\n",end.tv_usec);
-        delta=(end.tv_sec-start.tv_sec)*1000000+(end.tv_usec-start.tv_usec);//微秒
-    
-    }
-    struct timeval start;
-    struct timeval end;
-    float delta;
-
-};
 
 int main(int argc, char** argv)
 {
+    
+
+    
     cl_context context = 0;
     cl_command_queue commandQueue = 0;
     cl_program program = 0;
@@ -192,6 +160,10 @@ int main(int argc, char** argv)
     cl_kernel kernel = 0;
     cl_mem memObjects[3] = { 0, 0, 0 };
     cl_int errNum;
+   // uint64_t t1,t2,t3;
+    clock_t t1,t2,t3;
+
+    
     const char* filename = "/Users/wangmingyong/Projects/OpenCL/OpenCL/HelloWorld.cl";
     // 一、选择OpenCL平台并创建一个上下文
     context = CreateContext();
@@ -214,13 +186,17 @@ int main(int argc, char** argv)
         a[i] = (float)i;
         b[i] = (float)(ARRAY_SIZE - i);
     }
-    TimerDelta *timer = new TimerDelta();
-    timer->Start();
+
+    t1 = clock();  //mach_absolute_time();
+    printf("t1 = %.8f\n",(double)t1);
+    for(int j = 0;j <  ARRAY_SIZE;j++){
+        result[j] = a[j]+b[j];
+
+    }
+
+    t2 = clock(); //mach_absolute_time();
+    printf("t2 = %.8f\n",(double)t2);
     
-//    for(int j = 0;j <  ARRAY_SIZE;j++){
-//        result[j] = a[j]*b[j]+a[j+1]*b[j+1];
-//    }
-//    timer->Stop();
     //创建内存对象
     if (!CreateMemObjects(context, memObjects, a, b))
     {
@@ -244,9 +220,16 @@ int main(int argc, char** argv)
     errNum = clEnqueueReadBuffer(commandQueue, memObjects[2], CL_TRUE,
                                  0, ARRAY_SIZE * sizeof(float), result,
                                  0, NULL, NULL);
-    timer->Stop();
-    std::cout<<"the delta is = "<<timer->delta<<std::endl;
     
+    t3 = clock();  //mach_absolute_time();
+
+
+
+    
+    printf("cpu t = %.8f\n",(float)(t2-t1)/CLOCKS_PER_SEC);
+    printf("gpu t = %.8f \n",(double)(t3-t2)/CLOCKS_PER_SEC);
+    //std::cout<<"the noemal delta is = "<< CPU<<std::endl;
+   // std::cout<<"the opencl delta is = "<<(t3-t2)/CLOCKS_PER_SEC<<std::endl;
 //    for (int i = 0; i < ARRAY_SIZE; i++)
 //    {
 //        std::cout << result[i] << " ";
