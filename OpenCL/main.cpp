@@ -2,8 +2,8 @@
 //  main.cpp
 //  OpenCL
 //
-//  Created by 王明勇 on 2017/9/19.
-//  Copyright © 2017年 王明勇. All rights reserved.
+//  Created by wmy on 2017/9/19.
+//  Copyright © 2017年 wmy. All rights reserved.
 //
 
 
@@ -20,9 +20,18 @@
 #include <boost/algorithm/string.hpp>
 
 
+using namespace std;
+
+//const int ARRAY_SIZE = 100000;
 
 
-const int ARRAY_SIZE = 100000;
+//4*3---3*5
+
+const int midle = 600;
+const int heightA = 600;
+
+const int widthB = 600;
+//const int heightB = 3;
 
 //一、 选择OpenCL平台并创建一个上下文
 cl_context CreateContext()
@@ -113,14 +122,14 @@ cl_program CreateProgram(cl_context context, cl_device_id device, const char* fi
 
 //创建和构建程序对象
 bool CreateMemObjects(cl_context context, cl_mem memObjects[3],
-                      float *a, float *b)
+                      int *a, int *b)
 {
     memObjects[0] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-                                   sizeof(float) * ARRAY_SIZE, a, NULL);
+                                   sizeof(int) * midle*heightA, a, NULL);
     memObjects[1] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-                                   sizeof(float) * ARRAY_SIZE, b, NULL);
+                                   sizeof(int) * widthB*midle, b, NULL);
     memObjects[2] = clCreateBuffer(context, CL_MEM_READ_WRITE,
-                                   sizeof(float) * ARRAY_SIZE, NULL, NULL);
+                                   sizeof(int) * widthB*heightA, NULL, NULL);
     return true;
 }
 
@@ -178,22 +187,43 @@ int main(int argc, char** argv)
     kernel = clCreateKernel(program, "hello_kernel", NULL);
     
     //创建要处理的数据
-    float result[ARRAY_SIZE];
-    float a[ARRAY_SIZE];
-    float b[ARRAY_SIZE];
-    for (int i = 0; i < ARRAY_SIZE; i++)
+    int result[widthB*heightA]{0};
+    int a[midle*heightA];
+    int b[widthB*midle];
+    for (int i = 0; i < heightA; i++)
     {
-        a[i] = (float)i;
-        b[i] = (float)(ARRAY_SIZE - i);
+        for(int j = 0;j < midle;j++)
+        {
+            a[i*midle+j]=2;//10.0f * ((int) rand() / (int) RAND_MAX);
+        }
+        
+    }
+    
+    
+    for (int k = 0; k < midle; k++)
+    {
+        for(int m = 0;m < widthB;m++)
+        {
+            b[k*widthB+m]=3;//10.0f * ((int) rand() / (int) RAND_MAX);
+        }
+        
     }
 
     t1 = clock();  //mach_absolute_time();
     printf("t1 = %.8f\n",(double)t1);
-    for(int j = 0;j <  ARRAY_SIZE;j++){
-        result[j] = a[j]+b[j];
-
+    for(int l=0;l<heightA;l++){
+        for(int n = 0;n<widthB;n++){
+            for(int q=0;q<midle;q++){
+                result[l*widthB+n] +=a [l*midle+q]*b[q*widthB+n];
+                
+            }
+            //std::cout<<"r = "<<result[l*widthB+n]<<std::endl;
+        }
     }
 
+//    for(int l = 0;l<(midle*heightA);l++){
+//        result[l]=a[l]+b[l];
+//    }
     t2 = clock(); //mach_absolute_time();
     printf("t2 = %.8f\n",(double)t2);
     
@@ -208,19 +238,26 @@ int main(int argc, char** argv)
     errNum = clSetKernelArg(kernel, 0, sizeof(cl_mem), &memObjects[0]);
     errNum |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &memObjects[1]);
     errNum |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &memObjects[2]);
+    errNum |= clSetKernelArg(kernel, 3, sizeof(int), &heightA);
+    errNum |= clSetKernelArg(kernel, 4, sizeof(int), &widthB);
+    errNum |= clSetKernelArg(kernel, 5, sizeof(int), &midle);
     
-    size_t globalWorkSize[1] = { ARRAY_SIZE };
-    size_t localWorkSize[1] = { 1 };
+    size_t globalWorkSize[2];
+    globalWorkSize[0]= heightA*widthB;
+    globalWorkSize[1]=widthB;
+   // size_t localWorkSize[2] = { 1,1 };
     
     errNum = clEnqueueNDRangeKernel(commandQueue, kernel, 1, NULL,
-                                    globalWorkSize, localWorkSize,
+                                    globalWorkSize, NULL,
                                     0, NULL, NULL);
     
     // 六、 读取执行结果并释放OpenCL资源
     errNum = clEnqueueReadBuffer(commandQueue, memObjects[2], CL_TRUE,
-                                 0, ARRAY_SIZE * sizeof(float), result,
+                                 0, widthB*heightA * sizeof(int), result,
                                  0, NULL, NULL);
-    
+//    for(int p=0;p<20;p++){
+//        cout<<"new ="<<result[p];
+//    }
     t3 = clock();  //mach_absolute_time();
 
 
@@ -228,12 +265,7 @@ int main(int argc, char** argv)
     
     printf("cpu t = %.8f\n",(float)(t2-t1)/CLOCKS_PER_SEC);
     printf("gpu t = %.8f \n",(double)(t3-t2)/CLOCKS_PER_SEC);
-    //std::cout<<"the noemal delta is = "<< CPU<<std::endl;
-   // std::cout<<"the opencl delta is = "<<(t3-t2)/CLOCKS_PER_SEC<<std::endl;
-//    for (int i = 0; i < ARRAY_SIZE; i++)
-//    {
-//        std::cout << result[i] << " ";
-//    }
+
     std::cout << std::endl;
     std::cout << "Executed program succesfully." << std::endl;
     getchar();

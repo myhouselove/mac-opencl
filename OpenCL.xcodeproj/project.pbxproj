@@ -64,6 +64,7 @@
 		6C6BE6141F7F82C100D84239 /* libboost_unit_test_framework.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_unit_test_framework.dylib; path = ../../../../usr/local/lib/libboost_unit_test_framework.dylib; sourceTree = "<group>"; };
 		6C6BE6151F7F82C100D84239 /* libboost_wave.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_wave.dylib; path = ../../../../usr/local/lib/libboost_wave.dylib; sourceTree = "<group>"; };
 		6C6BE6161F7F82C100D84239 /* libboost_wserialization.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_wserialization.dylib; path = ../../../../usr/local/lib/libboost_wserialization.dylib; sourceTree = "<group>"; };
+		6C737A271FB01136009EADE9 /* test.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = test.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,6 +101,7 @@
 			children = (
 				6C6BE5E81F7052FC00D84239 /* main.cpp */,
 				6C6BE5EF1F70555E00D84239 /* HelloWorld.cl */,
+				6C737A271FB01136009EADE9 /* test.h */,
 			);
 			path = OpenCL;
 			sourceTree = "<group>";
