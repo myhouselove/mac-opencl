@@ -27,10 +27,10 @@ using namespace std;
 
 //4*3---3*5
 
-const int midle = 600;
-const int heightA = 600;
+const int midle = 10;
+const int heightA = 10;
 
-const int widthB = 600;
+const int widthB = 10;
 //const int heightB = 3;
 
 //一、 选择OpenCL平台并创建一个上下文
@@ -155,7 +155,7 @@ void Cleanup(cl_context context, cl_command_queue commandQueue,
     if (context != 0)
         clReleaseContext(context);
 }
-
+#define TIMES 1
 
 int main(int argc, char** argv)
 {
@@ -170,7 +170,7 @@ int main(int argc, char** argv)
     cl_mem memObjects[3] = { 0, 0, 0 };
     cl_int errNum;
    // uint64_t t1,t2,t3;
-    clock_t t1,t2,t3;
+    clock_t t1,t2,t3,t4;
 
     
     const char* filename = "/Users/wangmingyong/Projects/OpenCL/OpenCL/HelloWorld.cl";
@@ -210,14 +210,17 @@ int main(int argc, char** argv)
     }
 
     t1 = clock();  //mach_absolute_time();
-    printf("t1 = %.8f\n",(double)t1);
-    for(int l=0;l<heightA;l++){
-        for(int n = 0;n<widthB;n++){
-            for(int q=0;q<midle;q++){
-                result[l*widthB+n] +=a [l*midle+q]*b[q*widthB+n];
-                
+    //printf("t1 = %.8f\n",(double)t1);
+    
+    for(int tt=0;tt<TIMES;tt++){
+        for(int l=0;l<heightA;l++){
+            for(int n = 0;n<widthB;n++){
+                for(int q=0;q<midle;q++){
+                    result[l*widthB+n] +=a [l*midle+q]*b[q*widthB+n];
+                    
+                }
+                //std::cout<<"r = "<<result[l*widthB+n]<<std::endl;
             }
-            //std::cout<<"r = "<<result[l*widthB+n]<<std::endl;
         }
     }
 
@@ -225,7 +228,7 @@ int main(int argc, char** argv)
 //        result[l]=a[l]+b[l];
 //    }
     t2 = clock(); //mach_absolute_time();
-    printf("t2 = %.8f\n",(double)t2);
+    //printf("t2 = %.8f\n",(double)t2);
     
     //创建内存对象
     if (!CreateMemObjects(context, memObjects, a, b))
@@ -243,14 +246,18 @@ int main(int argc, char** argv)
     errNum |= clSetKernelArg(kernel, 5, sizeof(int), &midle);
     
     size_t globalWorkSize[2];
-    globalWorkSize[0]= heightA*widthB;
+    globalWorkSize[0]= heightA;
     globalWorkSize[1]=widthB;
    // size_t localWorkSize[2] = { 1,1 };
+     t3 = clock();
+    for(int run=0;run<TIMES;run++){
+        errNum = clEnqueueNDRangeKernel(commandQueue, kernel, 2, NULL,
+                                        globalWorkSize, NULL,
+                                        0, NULL, NULL);
+    }
     
-    errNum = clEnqueueNDRangeKernel(commandQueue, kernel, 1, NULL,
-                                    globalWorkSize, NULL,
-                                    0, NULL, NULL);
-    
+
+    t4 = clock();  //mach_absolute_time();
     // 六、 读取执行结果并释放OpenCL资源
     errNum = clEnqueueReadBuffer(commandQueue, memObjects[2], CL_TRUE,
                                  0, widthB*heightA * sizeof(int), result,
@@ -258,13 +265,12 @@ int main(int argc, char** argv)
 //    for(int p=0;p<20;p++){
 //        cout<<"new ="<<result[p];
 //    }
-    t3 = clock();  //mach_absolute_time();
-
+    
 
 
     
     printf("cpu t = %.8f\n",(float)(t2-t1)/CLOCKS_PER_SEC);
-    printf("gpu t = %.8f \n",(double)(t3-t2)/CLOCKS_PER_SEC);
+    printf("gpu t = %.8f \n",(double)(t4-t3)/CLOCKS_PER_SEC);
 
     std::cout << std::endl;
     std::cout << "Executed program succesfully." << std::endl;
