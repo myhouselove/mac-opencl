@@ -27,10 +27,10 @@ using namespace std;
 
 //4*3---3*5
 
-const int midle = 48;
-const int heightA = 48;
+const int midle = 512;
+const int heightA = 512;
 
-const int widthB = 48;
+const int widthB = 512;
 //const int heightB = 3;
 
 //一、 选择OpenCL平台并创建一个上下文
@@ -247,7 +247,7 @@ void checkError(cl_int error, int line) {
         exit(1);
     }
 }
-#define TIMES 1
+#define TIMES 10
 #define TS 16
 
 int main(int argc, char** argv)
@@ -328,10 +328,6 @@ int main(int argc, char** argv)
             }
         }
     }
-
-//    for(int l = 0;l<(midle*heightA);l++){
-//        result[l]=a[l]+b[l];
-//    }
     t2 = clock(); //mach_absolute_time();
     //printf("t2 = %.8f\n",(double)t2);
     
@@ -366,23 +362,25 @@ int main(int argc, char** argv)
             cout<<"enqueue success!"<<endl;
         else
             printf("errNum= %d\n",errNum);
+        
+        //mach_absolute_time();
+        // 六、 读取执行结果并释放OpenCL资源
+        errNum = clEnqueueReadBuffer(commandQueue, memObjects[2], CL_TRUE,
+                                     0, widthB*heightA * sizeof(int), result,
+                                     0, NULL, NULL);
+        //    for(int p=0;p<20;p++){
+        //        cout<<"new ="<<result[p];
+        //    }
+
     }
     
 
-    t4 = clock();  //mach_absolute_time();
-    // 六、 读取执行结果并释放OpenCL资源
-    errNum = clEnqueueReadBuffer(commandQueue, memObjects[2], CL_TRUE,
-                                 0, widthB*heightA * sizeof(int), result,
-                                 0, NULL, NULL);
-    for(int p=0;p<20;p++){
-        cout<<"new ="<<result[p];
-    }
-    
+        t4 = clock();
 
 
     
-    printf("cpu t = %.8f\n",(float)(t2-t1)/CLOCKS_PER_SEC);
-    printf("gpu t = %.8f \n",(double)(t4-t3)/CLOCKS_PER_SEC);
+    printf("cpu t = %.8f\n",(float)(t2-t1)/CLOCKS_PER_SEC/TIMES);
+    printf("gpu t = %.8f \n",(double)(t4-t3)/CLOCKS_PER_SEC/TIMES);
 
     std::cout << std::endl;
     std::cout << "Executed program succesfully." << std::endl;

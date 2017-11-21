@@ -18,7 +18,7 @@ __kernel void hello_kernel(const __global int* A,
 
     
     //barrier(CLK_LOCAL_MEM_FENCE);
-    printf("here\n");
+    //printf("here\n");
     //printf("group row=%d,col=%d\n",get_group_id(0),get_group_id(1));
     // Local memory to fit a tile of TS*TS elements of A and B
     __local int Asub[TS][TS];
@@ -36,7 +36,7 @@ __kernel void hello_kernel(const __global int* A,
         const int tiledCol = TS*t + col;
         Asub[col][row] = A[tiledCol*M + globalRow];
         Bsub[col][row] = B[globalCol*K + tiledRow];
-        printf("Asub[%d][%d]=A[%d]=%d\t",col,row,tiledCol*M + globalRow,A[tiledCol*M + globalRow]);
+        //printf("Asub[%d][%d]=A[%d]=%d\t",col,row,tiledCol*M + globalRow,A[tiledCol*M + globalRow]);
         // Synchronise to make sure the tile is loaded
         barrier(CLK_LOCAL_MEM_FENCE);
         //for(int j=0;j<)
@@ -45,7 +45,7 @@ __kernel void hello_kernel(const __global int* A,
             acc += Asub[k][row] * Bsub[col][k];
             //printf("acc[%d][%d]=%d\n",k,row,Asub[k][row]);
         }
-       // printf("acc = %d\n",acc);
+        //printf("acc = %d\n",acc);
         // Synchronise before loading the next tile
         barrier(CLK_LOCAL_MEM_FENCE);
     }
