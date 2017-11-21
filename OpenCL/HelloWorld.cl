@@ -11,13 +11,13 @@ __kernel void hello_kernel(__global const int *a,
     int row = get_global_id(0);
     int col = get_global_id(1);
 
-    printf("row =%d,col=%d\n",row,col);
+   // printf("row =%d,col=%d\n",row,col);
     int sum = 0;
     for(int i=0;i<compute_size;i++)
     {
         sum += a[row*compute_size+i] * b[i*result_matrix_col+col];
     }
-    printf("result_matrix[%d]=%d\n",row*result_matrix_col+col,sum);
+    //printf("result_matrix[%d]=%d\n",row*result_matrix_col+col,sum);
 
     result_matrix[row*result_matrix_col+col] = sum;
 

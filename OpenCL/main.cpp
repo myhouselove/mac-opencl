@@ -27,10 +27,10 @@ using namespace std;
 
 //4*3---3*5
 
-const int midle = 10;
-const int heightA = 10;
+const int midle = 128;
+const int heightA = 128;
 
-const int widthB = 10;
+const int widthB = 128;
 //const int heightB = 3;
 
 //一、 选择OpenCL平台并创建一个上下文
@@ -155,7 +155,7 @@ void Cleanup(cl_context context, cl_command_queue commandQueue,
     if (context != 0)
         clReleaseContext(context);
 }
-#define TIMES 1
+#define TIMES 10
 
 int main(int argc, char** argv)
 {
@@ -254,23 +254,24 @@ int main(int argc, char** argv)
         errNum = clEnqueueNDRangeKernel(commandQueue, kernel, 2, NULL,
                                         globalWorkSize, NULL,
                                         0, NULL, NULL);
+       
+        //    for(int p=0;p<20;p++){
+        //        cout<<"new ="<<result[p];
+        //    }
+        
+
     }
     
 
-    t4 = clock();  //mach_absolute_time();
+      //mach_absolute_time();
     // 六、 读取执行结果并释放OpenCL资源
+    t4 = clock();
+
     errNum = clEnqueueReadBuffer(commandQueue, memObjects[2], CL_TRUE,
                                  0, widthB*heightA * sizeof(int), result,
                                  0, NULL, NULL);
-//    for(int p=0;p<20;p++){
-//        cout<<"new ="<<result[p];
-//    }
-    
-
-
-    
-    printf("cpu t = %.8f\n",(float)(t2-t1)/CLOCKS_PER_SEC);
-    printf("gpu t = %.8f \n",(double)(t4-t3)/CLOCKS_PER_SEC);
+    printf("cpu t = %.8f\n",(float)(t2-t1)/CLOCKS_PER_SEC/TIMES);
+    printf("gpu t = %.8f \n",(double)(t4-t3)/CLOCKS_PER_SEC/TIMES);
 
     std::cout << std::endl;
     std::cout << "Executed program succesfully." << std::endl;
